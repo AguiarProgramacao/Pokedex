@@ -125,4 +125,9 @@ Durante o desenvolvimento, priorizei:
 - garantir separação clara de responsabilidades
 - entregar uma base sólida, escalável e profissional
 
-Caso queira discutir qualquer decisao tecnica, fico a disposicao para explicar as escolhas feitas e possiveis melhorias.
+Caso queira discutir qualquer decisão técnica, fico a disposição para explicar as escolhas feitas e possíveis melhorias.
+
+Nome: Rafael Aguiar
+Email: aguiarprogramacao@gmail.com
+Whatsapp: (21) 97463-3634
+Linkedin: https://linkedin.com/in/dev-rafael-aguiar
