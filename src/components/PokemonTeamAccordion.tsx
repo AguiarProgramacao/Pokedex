@@ -225,6 +225,10 @@ export function PokemonTeamAccordion({
                 <img
                   src={pokemon.imageUrl}
                   alt={formatPokemonName(pokemon.name)}
+                  loading="lazy"
+                  decoding="async"
+                  width={96}
+                  height={96}
                   className="mb-1.5 h-16 w-16 object-contain sm:mb-2 sm:h-24 sm:w-24"
                 />
                 <span className="text-xs font-semibold sm:text-sm">

@@ -105,9 +105,9 @@ export function PokemonDetailsPage() {
   return (
     <div className={`min-h-screen ${isDark ? 'bg-slate-950' : 'bg-slate-100'}`}>
       <section
-        className={`relative z-0 overflow-hidden ${theme.bg} ${theme.textOnBg} bg-linear-to-b from-white/10 via-transparent to-black/20 pb-28`}
+        className={`relative overflow-hidden ${theme.bg} ${theme.textOnBg} bg-linear-to-b from-white/10 via-transparent to-black/20 pb-28`}
       >
-        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 pt-8 sm:px-6">
+        <div className="relative mx-auto w-full max-w-3xl px-4 pt-8 sm:px-6">
           <div className="mb-10 flex items-center justify-between">
             <Link
               to="/"
@@ -180,7 +180,12 @@ export function PokemonDetailsPage() {
             <img
               src={pokemon.imageUrl}
               alt={formatPokemonName(pokemon.name)}
-              className="mx-auto mt-8 h-52 w-52 object-contain drop-shadow-2xl sm:absolute sm:right-6 sm:top-2 sm:mt-0 sm:h-64 sm:w-64"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              width={256}
+              height={256}
+              className="relative z-30 mx-auto mt-8 h-52 w-52 object-contain drop-shadow-2xl sm:absolute sm:right-6 sm:top-2 sm:mt-0 sm:h-64 sm:w-64"
             />
           </div>
         </div>

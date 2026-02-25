@@ -15,6 +15,7 @@ export function PokemonCard({ pokemon, index = 0 }: PokemonCardProps) {
   const { isDark } = useTheme()
   const favorite = isFavorite(pokemon.name)
   const disabled = isFull && !favorite
+  const isAboveTheFold = index < 4
 
   return (
     <article
@@ -56,7 +57,11 @@ export function PokemonCard({ pokemon, index = 0 }: PokemonCardProps) {
         <img
           src={pokemon.imageUrl}
           alt={formatPokemonName(pokemon.name)}
-          loading="lazy"
+          loading={isAboveTheFold ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : 'auto'}
+          decoding="async"
+          width={144}
+          height={144}
           className="mb-3 h-24 w-24 object-contain transition group-hover:scale-105 sm:mb-4 sm:h-36 sm:w-36"
         />
 

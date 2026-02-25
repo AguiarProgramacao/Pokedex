@@ -5,7 +5,7 @@ import { PokemonCard } from '../components/PokemonCard'
 import { PokemonTeamAccordion } from '../components/PokemonTeamAccordion'
 import { usePokemonTeam } from '../contexts/PokemonTeamContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { getPokemonList } from '../services/pokeApi'
+import { getPokemonList, hydratePokemonListTypes } from '../services/pokeApi'
 import type { PokemonListItem } from '../types/pokemon'
 import { formatPokemonType, getPokemonTheme } from '../utils/pokemonTheme'
 
@@ -28,8 +28,16 @@ export function HomePage() {
       setError(null)
 
       try {
-        const data = await getPokemonList(151)
-        if (isMounted) setPokemons(data)
+        const baseList = await getPokemonList(151, { includeTypes: false })
+        if (!isMounted) return
+
+        setPokemons(baseList)
+        setLoading(false)
+
+        const enrichedList = await hydratePokemonListTypes(baseList)
+        if (isMounted) {
+          setPokemons(enrichedList)
+        }
       } catch {
         if (isMounted) {
           setError('Não foi possível carregar os Pokémons. Tente novamente.')
@@ -87,7 +95,16 @@ export function HomePage() {
       >
         <div className="mx-auto grid w-full max-w-7xl grid-cols-[auto_1fr] items-center gap-x-3 gap-y-3 px-4 py-3 sm:flex sm:gap-3 sm:px-6 sm:py-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white sm:h-12 sm:w-12">
-            <img src={Pokebola} alt="pokebola" className="h-full w-full object-contain" />
+            <img
+              src={Pokebola}
+              alt="pokebola"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              width={48}
+              height={48}
+              className="h-full w-full object-contain"
+            />
           </div>
 
           <div className="min-w-0">
@@ -209,7 +226,7 @@ export function HomePage() {
           </div>
         ) : null}
 
-        {loading ? (
+        {loading && pokemons.length === 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {Array.from({ length: 10 }).map((_, index) => (
               <div

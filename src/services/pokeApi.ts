@@ -23,6 +23,9 @@ const extractPokemonIdFromUrl = (url: string): number => {
 }
 
 const getPokemonSpriteUrl = (id: number) =>
+  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+
+const getPokemonArtworkUrl = (id: number) =>
   `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
 
 const formatDisplayName = (value: string) =>
@@ -31,23 +34,7 @@ const formatDisplayName = (value: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
 
-export const getPokemonList = async (limit = 151): Promise<PokemonListItem[]> => {
-  const { data } = await pokeApi.get<PokemonListApiResponse>('/pokemon', {
-    params: { limit },
-  })
-
-  const baseList = data.results.map((pokemon) => {
-    const id = extractPokemonIdFromUrl(pokemon.url)
-
-    return {
-      id,
-      name: pokemon.name,
-      imageUrl: getPokemonSpriteUrl(id),
-      detailsUrl: pokemon.url,
-      types: [],
-    }
-  })
-
+const enrichPokemonListWithTypes = async (baseList: PokemonListItem[]) => {
   const chunkSize = 20
   const typesMap = new Map<number, string[]>()
 
@@ -80,6 +67,35 @@ export const getPokemonList = async (limit = 151): Promise<PokemonListItem[]> =>
   }))
 }
 
+export const getPokemonList = async (
+  limit = 151,
+  options?: { includeTypes?: boolean },
+): Promise<PokemonListItem[]> => {
+  const { data } = await pokeApi.get<PokemonListApiResponse>('/pokemon', {
+    params: { limit },
+  })
+
+  const baseList = data.results.map((pokemon) => {
+    const id = extractPokemonIdFromUrl(pokemon.url)
+
+    return {
+      id,
+      name: pokemon.name,
+      imageUrl: getPokemonSpriteUrl(id),
+      detailsUrl: pokemon.url,
+      types: [],
+    }
+  })
+
+  if (options?.includeTypes === false) {
+    return baseList
+  }
+
+  return enrichPokemonListWithTypes(baseList)
+}
+
+export const hydratePokemonListTypes = enrichPokemonListWithTypes
+
 export const getPokemonDetails = async (name: string): Promise<PokemonDetails> => {
   const { data } = await pokeApi.get<PokemonDetailsApiResponse>(`/pokemon/${name}`)
 
@@ -89,7 +105,7 @@ export const getPokemonDetails = async (name: string): Promise<PokemonDetails> =
     imageUrl:
       data.sprites.other?.['official-artwork']?.front_default ??
       data.sprites.front_default ??
-      getPokemonSpriteUrl(data.id),
+      getPokemonArtworkUrl(data.id),
     height: data.height / 10,
     weight: data.weight / 10,
     types: data.types
